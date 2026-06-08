@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-Z Concepts — Site Generator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Geist+Mono:wght@300;400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #4f8ef7;
+    --accent2: #7c5cbf;
+    --text: #e8e8f0;
+    --muted: #666688;
+    --error: #f75f5f;
+  }
+
+  body {
+    font-family: 'Geist Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header p {
+    color: var(--muted);
+    font-size: 0.75rem;
+    margin-top: 6px;
+    letter-spacing: 0.06em;
+  }
+
+  .fake-btn {
+    margin-top: 14px;
+    padding: 8px 20px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--muted);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.05em;
+  }
+
+  .fake-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .section-label {
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  input, select, textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+
+  textarea { resize: vertical; min-height: 80px; }
+  select option { background: var(--surface); }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .service-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 0.68rem;
+    color: var(--muted);
+    user-select: none;
+  }
+
+  .service-chip input[type="checkbox"] { display: none; }
+
+  .service-chip.checked {
+    border-color: var(--accent);
+    color: var(--text);
+    background: rgba(79, 142, 247, 0.08);
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .service-chip.checked .dot { background: var(--accent); }
+
+  .t-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .t-quote { grid-column: 1 / -1; }
+
+  .generate-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 8px;
+  }
+
+  .generate-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .generate-btn:active { transform: translateY(0); }
+  .generate-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+  #outputArea { display: none; margin-top: 24px; }
+  #outputArea.visible { display: block; }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(79, 142, 247, 0.07);
+    border: 1px solid rgba(79, 142, 247, 0.2);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.72rem;
+    color: var(--accent);
+  }
+
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(79, 142, 247, 0.3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .code-output {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+  }
+
+  .code-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  .btn-sm {
+    padding: 5px 13px;
+    border-radius: 5px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.68rem;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    transition: all 0.15s;
+  }
+
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-sm.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    margin-left: 6px;
+  }
+
+  .btn-sm.primary:hover { opacity: 0.85; color: white; border-color: var(--accent); }
+
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-size: 0.68rem;
+    line-height: 1.7;
+    color: #8888aa;
+    max-height: 380px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .error-msg {
+    padding: 12px 16px;
+    background: rgba(247, 95, 95, 0.07);
+    border: 1px solid rgba(247, 95, 95, 0.2);
+    border-radius: 8px;
+    color: var(--error);
+    font-size: 0.72rem;
+    display: none;
+  }
+
+  .preview-frame {
+    width: 100%;
+    height: 600px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-top: 14px;
+    background: white;
+    display: none;
+  }
+
+  .preview-frame.visible { display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>A-Z Site Generator</h1>
+  <p>// client intake → deployable HTML</p>
+  <button class="fake-btn" onclick="fillFakeData()">⚡ Fill with random client</button>
+</div>
+
+<!-- 01 BUSINESS INFO -->
+<div class="card">
+  <div class="section-label">01 · Business Info</div>
+  <div class="grid-2">
+    <div class="field">
+      <label>Business Name</label>
+      <input id="bizName" placeholder="Mesa Pro Plumbing" />
+    </div>
+    <div class="field">
+      <label>Trade / Industry</label>
+      <select id="trade">
+        <option value="">Select trade...</option>
+        <option>Plumbing</option>
+        <option>HVAC</option>
+        <option>Electrical</option>
+        <option>Roofing</option>
+        <option>General Contractor</option>
+        <option>Landscaping</option>
+        <option>Concrete / Masonry</option>
+        <option>Painting</option>
+        <option>Flooring</option>
+        <option>Fencing</option>
+        <option>Pool Service</option>
+        <option>Pest Control</option>
+        <option>Moving</option>
+        <option>Cleaning</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>City / Primary Service Area</label>
+      <input id="city" placeholder="Mesa, AZ" />
+    </div>
+    <div class="field">
+      <label>Phone Number</label>
+      <input id="phone" placeholder="(480) 555-1234" />
+    </div>
+    <div class="field full">
+      <label>Tagline (optional)</label>
+      <input id="tagline" placeholder="Fast, honest service — guaranteed." />
+    </div>
+    <div class="field full">
+      <label>Trust Stats (optional)</label>
+      <input id="stats" placeholder="12 years in business · 500+ jobs completed · Licensed & Insured" />
+    </div>
+  </div>
+</div>
+
+<!-- 02 SERVICES -->
+<div class="card">
+  <div class="section-label">02 · Service Tags</div>
+  <div class="services-grid" id="servicesGrid"></div>
+  <div class="field" style="margin-top:12px">
+    <label>Additional / Custom Services</label>
+    <input id="customServices" placeholder="Emergency same-day, commercial contracts, senior discounts..." />
+  </div>
+</div>
+
+<!-- 03 SERVICE AREAS -->
+<div class="card">
+  <div class="section-label">03 · Cities Served</div>
+  <div class="field">
+    <label>List cities (comma separated)</label>
+    <input id="areas" placeholder="Mesa, Chandler, Gilbert, Tempe, Scottsdale, Queen Creek" />
+  </div>
+</div>
+
+<!-- 04 ABOUT -->
+<div class="card">
+  <div class="section-label">04 · About</div>
+  <div class="grid-2">
+    <div class="field">
+      <label>Owner Name (optional)</label>
+      <input id="ownerName" placeholder="Mike Rodriguez" />
+    </div>
+    <div class="field full">
+      <label>About Blurb (leave blank to auto-generate)</label>
+      <textarea id="about" placeholder="Family-owned since 2012. We treat every home like our own..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- 05 TESTIMONIALS -->
+<div class="card">
+  <div class="section-label">05 · Testimonials (optional)</div>
+  <div id="testimonialsWrap">
+    <div class="t-row">
+      <input class="t-name" placeholder="Customer name" />
+      <input class="t-loc" placeholder="City, AZ" />
+      <textarea class="t-quote" placeholder="What they said..."></textarea>
+    </div>
+    <div class="t-row">
+      <input class="t-name" placeholder="Customer name" />
+      <input class="t-loc" placeholder="City, AZ" />
+      <textarea class="t-quote" placeholder="What they said..."></textarea>
+    </div>
+    <div class="t-row">
+      <input class="t-name" placeholder="Customer name" />
+      <input class="t-loc" placeholder="City, AZ" />
+      <textarea class="t-quote" placeholder="What they said..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- 06 STYLE -->
+<div class="card">
+  <div class="section-label">06 · Style Direction</div>
+  <div class="grid-2">
+    <div class="field">
+      <label>Color Scheme</label>
+      <select id="colorScheme">
+        <option value="blue">Professional Blue</option>
+        <option value="orange">Bold Orange</option>
+        <option value="green">Trust Green</option>
+        <option value="red">Urgent Red</option>
+        <option value="dark">Dark / Premium</option>
+        <option value="clean">Clean White</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Vibe</label>
+      <select id="vibe">
+        <option value="professional">Professional & Trustworthy</option>
+        <option value="bold">Bold & Direct</option>
+        <option value="friendly">Friendly & Local</option>
+        <option value="premium">Premium & Clean</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<button class="generate-btn" id="generateBtn" onclick="generateSite()">Generate Site →</button>
+
+<!-- OUTPUT -->
+<div id="outputArea">
+  <div class="status-bar" id="statusBar">
+    <div class="spinner"></div>
+    <span id="statusText">Building your site with Claude...</span>
+  </div>
+  <div class="code-output" id="codeOutput">
+    <div class="code-toolbar">
+      <span id="fileLabel">index.html</span>
+      <div>
+        <button class="btn-sm" onclick="copyCode()">Copy HTML</button>
+        <button class="btn-sm primary" onclick="togglePreview()" id="previewBtn">Preview</button>
+      </div>
+    </div>
+    <pre id="codeContent"></pre>
+  </div>
+  <div class="error-msg" id="errorMsg"></div>
+  <iframe class="preview-frame" id="previewFrame"></iframe>
+</div>
+
+<script>
+// Populate service chips
+const chips = ['Residential','Commercial','Emergency / 24-7','Free Estimates','Licensed & Insured','Senior Discounts','Same-Day Service','Warranty Included','Financing Available'];
+const grid = document.getElementById('servicesGrid');
+chips.forEach(s => {
+  const el = document.createElement('label');
+  el.className = 'service-chip';
+  el.innerHTML = `<input type="checkbox" value="${s}"><div class="dot"></div>${s}`;
+  el.addEventListener('click', () => {
+    const cb = el.querySelector('input');
+    cb.checked = !cb.checked;
+    el.classList.toggle('checked', cb.checked);
+  });
+  grid.appendChild(el);
+});
+
+function getChecked() {
+  return [...document.querySelectorAll('.service-chip.checked')].map(c => c.querySelector('input').value);
+}
+
+function getTestimonials() {
+  return [...document.querySelectorAll('.t-row')].reduce((acc, row) => {
+    const name = row.querySelector('.t-name').value.trim();
+    const loc = row.querySelector('.t-loc').value.trim();
+    const quote = row.querySelector('.t-quote').value.trim();
+    if (name || quote) acc.push({ name, loc, quote });
+    return acc;
+  }, []);
+}
+
+let generatedHTML = '';
+let previewOpen = false;
+
+function fillFakeData() {
+  const clients = [
+    {
+      bizName: 'Desert Peak Roofing', trade: 'Roofing', city: 'Gilbert, AZ',
+      phone: '(480) 721-3344', tagline: 'Arizona\'s most trusted roofers — since 2008.',
+      stats: '15+ years in business · 2,000+ roofs replaced · Licensed, Bonded & Insured',
+      ownerName: 'Tony Garza',
+      about: 'Family-owned and operated out of Gilbert since 2008. Tony started Desert Peak after 10 years working for a national chain — he wanted to do things right, not fast. Every roof we install is backed by a 10-year workmanship warranty.',
+      areas: 'Gilbert, Chandler, Mesa, Queen Creek, San Tan Valley, Tempe',
+      customServices: 'Insurance claim assistance, storm damage inspection, free 27-point roof audit',
+      testimonials: [
+        { name: 'Brenda K.', loc: 'Gilbert, AZ', quote: 'Tony and his crew were on time, clean, and done in a day. Best contractor experience I\'ve had in 20 years of homeownership.' },
+        { name: 'Marcus D.', loc: 'Chandler, AZ', quote: 'They helped us through the whole insurance claim. We got a brand new roof and barely paid anything out of pocket.' },
+        { name: 'Sarah & Tom R.', loc: 'Queen Creek, AZ', quote: 'Professional from start to finish. No upsells, no nonsense. Just honest work at a fair price.' }
+      ],
+      chips: ['Residential','Free Estimates','Licensed & Insured','Same-Day Service','Warranty Included'],
+      colorScheme: 'orange', vibe: 'bold'
+    },
+    {
+      bizName: 'Sonoran Air & Heat', trade: 'HVAC', city: 'Tempe, AZ',
+      phone: '(602) 884-5500', tagline: 'Stay cool when it matters most.',
+      stats: '20 years serving the Valley · 10,000+ systems serviced · 4.9★ Google rating',
+      ownerName: 'Luis Mendez',
+      about: 'Luis founded Sonoran Air in 2004 after seeing too many homeowners get overcharged by big HVAC companies. We\'re a local, honest alternative — flat-rate pricing, no service call fees, and same-day availability 7 days a week.',
+      areas: 'Tempe, Scottsdale, Phoenix, Mesa, Ahwatukee, Chandler',
+      customServices: 'Emergency 24/7 service, AC tune-ups, duct cleaning, smart thermostat install',
+      testimonials: [
+        { name: 'James W.', loc: 'Tempe, AZ', quote: 'AC went out on a 114-degree day. Luis had a tech out within 2 hours. Absolute lifesavers.' },
+        { name: 'Kathy M.', loc: 'Scottsdale, AZ', quote: 'Finally an HVAC company that doesn\'t try to sell you a new unit when a repair will do. Honest and fast.' },
+        { name: 'Derek P.', loc: 'Phoenix, AZ', quote: 'Been using Sonoran for 8 years. Never been let down once. Worth every penny.' }
+      ],
+      chips: ['Residential','Commercial','Emergency / 24-7','Free Estimates','Licensed & Insured','Same-Day Service'],
+      colorScheme: 'blue', vibe: 'professional'
+    },
+    {
+      bizName: 'Copper State Electric', trade: 'Electrical', city: 'Mesa, AZ',
+      phone: '(480) 933-7710', tagline: 'Licensed electricians. Upfront pricing. No surprises.',
+      stats: '18 years in business · 4,500+ jobs completed · Master Electrician on every job',
+      ownerName: 'Dave & Rachel Kim',
+      about: 'Dave is a Master Electrician with 25 years of experience. He and his wife Rachel started Copper State in 2006 to bring honest, code-compliant electrical work to Mesa and the East Valley. No subcontractors — every tech is a licensed employee.',
+      areas: 'Mesa, Gilbert, Chandler, Tempe, Apache Junction, Gold Canyon',
+      customServices: 'Panel upgrades, EV charger installation, whole-home rewires, commercial buildouts',
+      testimonials: [
+        { name: 'Paul T.', loc: 'Mesa, AZ', quote: 'Dave did a full panel upgrade and EV charger install. Clean, fast, inspected and permitted properly. No issues.' },
+        { name: 'Angela F.', loc: 'Gilbert, AZ', quote: 'I\'ve used 3 other electricians over the years. Copper State is the only one I\'d call again without hesitation.' },
+        { name: 'Ron & Lisa B.', loc: 'Chandler, AZ', quote: 'Fair quote, showed up on time, did exactly what they said. Rare these days.' }
+      ],
+      chips: ['Residential','Commercial','Licensed & Insured','Free Estimates','Warranty Included','Financing Available'],
+      colorScheme: 'red', vibe: 'professional'
+    },
+    {
+      bizName: 'Verde Valley Landscaping', trade: 'Landscaping', city: 'Scottsdale, AZ',
+      phone: '(480) 557-2290', tagline: 'Desert landscaping that actually looks good.',
+      stats: '12 years local · 800+ yards transformed · Water-wise certified',
+      ownerName: 'Carlos Reyes',
+      about: 'Carlos has been designing desert landscapes in the Valley for over 12 years. His crew specializes in low-water, high-impact designs — native plants, decomposed granite, flagstone, and drip systems that cut your water bill in half.',
+      areas: 'Scottsdale, Paradise Valley, Fountain Hills, Cave Creek, Carefree, Tempe',
+      customServices: 'Drip system install & repair, artificial turf, pool surrounds, monthly maintenance contracts',
+      testimonials: [
+        { name: 'Jennifer H.', loc: 'Scottsdale, AZ', quote: 'Our front yard went from an eyesore to a showstopper. Carlos has a real eye for design.' },
+        { name: 'Bill N.', loc: 'Paradise Valley, AZ', quote: 'On budget, on time, and the plants are thriving a year later. Exactly what we wanted.' },
+        { name: 'Melissa C.', loc: 'Fountain Hills, AZ', quote: 'The drip system alone cut our water bill by 40%. Carlos knows what he\'s doing.' }
+      ],
+      chips: ['Residential','Commercial','Free Estimates','Licensed & Insured','Senior Discounts','Warranty Included'],
+      colorScheme: 'green', vibe: 'friendly'
+    }
+  ];
+
+  const c = clients[Math.floor(Math.random() * clients.length)];
+
+  document.getElementById('bizName').value = c.bizName;
+  document.getElementById('trade').value = c.trade;
+  document.getElementById('city').value = c.city;
+  document.getElementById('phone').value = c.phone;
+  document.getElementById('tagline').value = c.tagline;
+  document.getElementById('stats').value = c.stats;
+  document.getElementById('ownerName').value = c.ownerName;
+  document.getElementById('about').value = c.about;
+  document.getElementById('areas').value = c.areas;
+  document.getElementById('customServices').value = c.customServices;
+  document.getElementById('colorScheme').value = c.colorScheme;
+  document.getElementById('vibe').value = c.vibe;
+
+  // Reset and set checkboxes
+  document.querySelectorAll('.service-chip').forEach(chip => {
+    chip.classList.remove('checked');
+    chip.querySelector('input').checked = false;
+  });
+  c.chips.forEach(name => {
+    document.querySelectorAll('.service-chip').forEach(chip => {
+      if (chip.querySelector('input').value === name) {
+        chip.classList.add('checked');
+        chip.querySelector('input').checked = true;
+      }
+    });
+  });
+
+  // Fill testimonials
+  const rows = document.querySelectorAll('.t-row');
+  c.testimonials.forEach((t, i) => {
+    if (rows[i]) {
+      rows[i].querySelector('.t-name').value = t.name;
+      rows[i].querySelector('.t-loc').value = t.loc;
+      rows[i].querySelector('.t-quote').value = t.quote;
+    }
+  });
+}
+
+async function generateSite() {
+  const bizName = document.getElementById('bizName').value.trim();
+  const trade = document.getElementById('trade').value;
+  const city = document.getElementById('city').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  if (!bizName || !trade || !city || !phone) { alert('Fill in Business Name, Trade, City, and Phone.'); return; }
+
+  const p = {
+    bizName, trade, city, phone,
+    tagline: document.getElementById('tagline').value.trim(),
+    stats: document.getElementById('stats').value.trim(),
+    checkedServices: getChecked(),
+    customServices: document.getElementById('customServices').value.trim(),
+    areas: document.getElementById('areas').value.trim(),
+    ownerName: document.getElementById('ownerName').value.trim(),
+    about: document.getElementById('about').value.trim(),
+    testimonials: getTestimonials(),
+    colorScheme: document.getElementById('colorScheme').value,
+    vibe: document.getElementById('vibe').value,
+  };
+
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+
+  const outputArea = document.getElementById('outputArea');
+  const statusBar = document.getElementById('statusBar');
+  const codeOutput = document.getElementById('codeOutput');
+  const errorMsg = document.getElementById('errorMsg');
+  const previewFrame = document.getElementById('previewFrame');
+
+  outputArea.style.display = 'block';
+  statusBar.style.display = 'flex';
+  codeOutput.style.display = 'none';
+  errorMsg.style.display = 'none';
+  previewFrame.classList.remove('visible');
+  previewOpen = false;
+  document.getElementById('previewBtn').textContent = 'Preview';
+
+  const colorMap = {
+    blue: 'deep navy #1e3a8a as primary, white background, blue accent #3b82f6',
+    orange: 'bold orange #ea580c as primary, white background, dark charcoal text',
+    green: 'forest green #16a34a as primary, white background, clean and trustworthy',
+    red: 'strong red #dc2626 as primary, white background, urgent and bold',
+    dark: 'dark #0f172a background, white text, gold #f59e0b accents — premium feel',
+    clean: 'white background, light grays, charcoal text, minimal blue accent — ultra clean',
+  };
+  const vibeMap = {
+    professional: 'trustworthy, established, reliable, corporate-adjacent — no fluff',
+    bold: 'big typography, direct CTAs, confident, no-nonsense contractor energy',
+    friendly: 'warm, local, community-focused, family business feel',
+    premium: 'luxury whitespace, refined typography, high-end feel',
+  };
+
+  const testimonialSection = p.testimonials.length
+    ? p.testimonials.map(t => `"${t.quote}" — ${t.name}${t.loc ? ', ' + t.loc : ''}`).join('\n')
+    : 'Generate 3 realistic-sounding 5-star reviews for this type of contractor business.';
+
+  const prompt = `You are a senior web designer. Build a complete, single-file, production-ready HTML website for a contractor business. Output ONLY the raw HTML — no explanation, no markdown fences, no preamble. Start directly with <!DOCTYPE html>.
+
+CLIENT:
+Business: ${p.bizName}
+Trade: ${p.trade}
+City: ${p.city}
+Phone: ${p.phone}
+${p.tagline ? 'Tagline: ' + p.tagline : ''}
+${p.stats ? 'Stats: ' + p.stats : ''}
+${p.ownerName ? 'Owner: ' + p.ownerName : ''}
+${p.about ? 'About: ' + p.about : ''}
+${p.areas ? 'Cities served: ' + p.areas : ''}
+${p.checkedServices.length ? 'Service tags: ' + p.checkedServices.join(', ') : ''}
+${p.customServices ? 'Additional services: ' + p.customServices : ''}
+
+TESTIMONIALS:
+${testimonialSection}
+
+DESIGN:
+Colors: ${colorMap[p.colorScheme]}
+Vibe: ${vibeMap[p.vibe]}
+Typography: Use Google Fonts — pick distinctive fonts suited to the vibe. DO NOT use Inter, Arial, Roboto, or system fonts.
+Mobile responsive. Smooth scroll. Hover effects.
+
+REQUIRED SECTIONS (in order):
+1. Sticky Nav — business name left, phone number right as a tel: link
+2. Hero — large headline, subheadline, two buttons: "Call Now" (tel:) and "Get Free Quote" (scroll to #contact)
+3. Trust Bar — 3–4 badges: years in business, jobs completed, licensed & insured, response time, etc.
+4. Services — card grid with emoji icon, service name, short 1-sentence description
+5. Service Areas — city grid, clean layout
+6. About — short owner/company story, local angle
+7. Testimonials — 3 review cards, stars, quote, name, location
+8. Contact (#contact) — large phone display, and a simple form: name, phone, message, submit button that shows a thank you message on click (no backend)
+9. Footer — name, phone, copyright ${new Date().getFullYear()}
+
+Build it to look like it was made by a professional agency. High quality. Every detail matters.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+
+    let html = data.content?.find(b => b.type === 'text')?.text || '';
+    html = html.replace(/^```html\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim();
+    generatedHTML = html;
+
+    document.getElementById('statusText').textContent = '✓ Site generated';
+    setTimeout(() => { statusBar.style.display = 'none'; }, 1800);
+    document.getElementById('codeContent').textContent = html;
+    document.getElementById('fileLabel').textContent = `${p.bizName.toLowerCase().replace(/\s+/g, '-')}.html`;
+    codeOutput.style.display = 'block';
+  } catch (err) {
+    statusBar.style.display = 'none';
+    errorMsg.style.display = 'block';
+    errorMsg.textContent = 'Error: ' + err.message;
+  }
+
+  btn.disabled = false; btn.textContent = 'Generate Site →';
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(generatedHTML).then(() => {
+    const b = document.querySelector('.btn-sm');
+    b.textContent = 'Copied!';
+    setTimeout(() => b.textContent = 'Copy HTML', 1600);
+  });
+}
+
+function togglePreview() {
+  const frame = document.getElementById('previewFrame');
+  const btn = document.getElementById('previewBtn');
+  previewOpen = !previewOpen;
+  if (previewOpen) {
+    frame.classList.add('visible');
+    frame.srcdoc = generatedHTML;
+    btn.textContent = 'Hide Preview';
+  } else {
+    frame.classList.remove('visible');
+    btn.textContent = 'Preview';
+  }
+}
+</script>
+</body>
+</html>
